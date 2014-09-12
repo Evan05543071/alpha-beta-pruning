@@ -1,0 +1,29 @@
+This code was developed for an assignment for the Artificial Intelligence course at USC using C++. The assignment requested to program an Alpha-Beta Pruning Game Tree for a game where given a square board two players would alternate coloring the squares and the final score would be the difference between the size of the largest connected (4-connection) area of each player. The program is responsible to print the best play for the next turn given a board configuration.
+
+1 - Program Description
+
+The program is divided in 5 classes, IO.cpp, Map.cpp, ObjectIdentifier.cpp, Node.cpp, main.cpp.
+
+The class IO.cpp is responsible for writing and reading text files, with two methods fileToString(string fileName) which reads the file specified by the path in the string fileName, and stringToFile(string fileName, string text) which writes the string text into a file specified by the string fileName.
+
+The class Map.cpp will hold the board state using an variable to hold the size of the map and an array to store the value of each square on the board (0 to empty squares, 1 to red squares and 2 to gold squares). On this class there is three non-empty constructors: Map(string init) which assigns proper values to the variable based on a string specified as a parameter formatted as described in the assignment, Map(const int size) which creates an empty map of size specified as parameter, and Map(const Map& orig) which is a copy constructor copy the values of a previous object to a new object. Also the class has methods to get and set the value of a square in the board, a method to check if the square is empty, a method to check if the board is full, a method to get the size, and a method that returns the next player to play given the actual configuration of the board.
+
+The class ObjectIdentifier.cpp is a class that given a binary image it is able to label the clusters of "pixels" set to 1, as the clustering rule described in the assignment is implemented in this class, also known as 4-connected. For labeling it is used a DFS approach, described in the identify method that also stores the max sized cluster label and its size. The class returns the max sized cluster label and its size through two getters methods. There is also a setter for setting the binary image array.
+
+The class Node.cpp describes each node in the search tree. The class is designed based on the problem and in the Alpha-Beta Pruning algorithm, so the variables and methods represent the details of the problem and the algorithm. The variables will hold the following information: map object with actual state of the board, turn player name ('r' or 'g'), min or max turn, possible successors (two vectors holding the x and y coordinates of the possible plays), minmax value, alpha and beta for pruning, best next plays (also two vectors holding the x and y coordinates of the possible plays). The method successors() generate the possible plays for the player, the method utility() calculates the utility value for a leaf node using a binary image labeling (ObjectIdentifier.cpp class) approach to determine the biggest red and gold clusters and calculate the appropriate score as described in the assignment, the method play sets up a empty node to be a successor of the node. These methods are used in the minmax(alpha, beta) method that will run the alpha-beta pruning (as described in Russel & Norvig "Artificial Intelligence A Modern Approach") algorithm recursively and store the best plays and their values. Other methods are setters for map object, minmax turn, and turn player name, and getPlay() which returns a string with the best plays for the player. Whenever pruning happens during the algorithm it is printed a line to the console as the assignment asks for.
+
+The last class, main.cpp, is the class responsible for running the program. It reads the input file "input.txt" from the same directory of the program and split the information in it corresponding to each run in strings. Then for each run it creates a map and a node object, using the map constructor with the input string for the run, and the node is empty and will be set up with the map object, the initial turn is set for max, an internal method to set the turn player name based on the board state. Then it runs the Alpha-Beta Pruning algorithm from the node object passing the minimum and maximum int values (-2147483648 and 2147483647 for gcc 4.2.1 installed in aludra) for alpha and beta respectively. Then the best plays and the minmax value for the starting node for each run is appended to a string stream that will be written in the output.txt file.
+
+2 - Compile Instructions
+
+To compile the program type the following command on the Terminal: g++ main.cpp IO.cpp Node.cpp Map.cpp ObjectIdentifier.cpp
+
+For the program to run correctly the input.txt file needs to be in the same directory as the output file generated after compilation.
+
+To run the program after compiling type the following command on the Terminal: ./a.out
+
+After running the output.txt file is located at the same directory as the a.out file.
+
+3 - Heuristic and Utility Functions
+
+No heuristic function was used in this program. The program performs a limitless alpha-beta pruning algorithm search, where the leaf node is a node which there is no more blank spaces to be played. The utility function used is the one described in the assignment where the value = size of biggest cluster for max player - size of biggest cluster for min player, where max player is the player who has the next play given the actual state of the board, and min player the opponent.
